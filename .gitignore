@@ -1,0 +1,7 @@
+# ignore all files that should not be in the repository
+.venv/
+*.pyc
+.idea/
+/public_health_visualization_app/migrations
+/public_health_visualization_app/__pycache__
+staticfiles/

@@ -1,0 +1,190 @@
+/* Base Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+.container {
+    margin: 5%;
+}
+
+.card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+/* Layout */
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Overview Card */
+.overview-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.metric {
+    background-color: #e3f2fd;
+    padding: 8px;
+    border-radius: 4px;
+    flex: 1 1 100px;
+    font-size: 0.9em;
+}
+
+/* Chart Card */
+.chart-card {
+    text-align: center;
+    min-height: 500px;
+}
+
+/* Options Section */
+.options-section {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    width: 100%;
+    text-align: center;
+}
+
+.options-section h3 {
+    margin-top: 0;
+    font-size: 1.2em;
+    color: #333;
+}
+
+.options-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.options-section select,
+.options-section input[type="number"],
+.options-section button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+.options-section select:focus,
+.options-section input[type="number"]:focus,
+.options-section button:focus {
+    border-color: #0288d1;
+    outline: none;
+}
+
+/* Adjust the width of the button and the centered select metric dropdown */
+.options-section .form-group select,
+.options-section .form-group button {
+    width: 30%;
+    margin: 0 auto;
+}
+
+/* Align labels to the left */
+.options-section label {
+    text-align: left;
+}
+
+/* Ensure the select metric label is centered */
+.options-section .form-group label {
+    text-align: center;
+}
+
+.options-section button {
+    background-color: #0288d1;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.options-section button:hover {
+    background-color: #0277bd;
+}
+
+.options-section button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Form Layout */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.form-column {
+    flex: 1;
+}
+
+/* Data Table */
+.data-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #0288d1;
+    color: #fff;
+    cursor: pointer;
+    margin: 0 5px;
+}
+
+.pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+    .content {
+        flex-direction: row;
+    }
+
+    .overview-card, .chart-card {
+        flex: 1;
+    }
+
+    .form-row {
+        flex-direction: row;
+    }
+}

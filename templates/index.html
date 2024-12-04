@@ -1,0 +1,212 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Health Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="icon" href="{% static 'images/favicon.png' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1 style="text-align: center">Public Health Visualization</h1>
+    <!-- Main content area -->
+    <div class="content">
+        <!-- Overview Card -->
+        <div class="card overview-card">
+            <h2>Overview: {{ metric|title }}</h2>
+            <div class="overview-metrics">
+                <div class="metric">
+                    <h3>Average Value</h3>
+                    <p>{{ overview.avg_value|floatformat:2 }}</p>
+                </div>
+                <div class="metric">
+                    <h3>Maximum Value</h3>
+                    <p>{{ overview.max_value|floatformat:2 }}</p>
+                </div>
+                <div class="metric">
+                    <h3>Minimum Value</h3>
+                    <p>{{ overview.min_value|floatformat:2 }}</p>
+                </div>
+                <div class="metric">
+                    <h3>Record Count</h3>
+                    <p>{{ overview.count }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Area -->
+        <div class="card chart-card">
+            <h2>Chart</h2>
+            <canvas id="metric-chart"></canvas>
+        </div>
+    </div>
+
+    <!-- Options Section -->
+    <div class="card options-section">
+        <form id="filter-form">
+            <!-- Metric Selection -->
+            <div class="form-group">
+                <label for="metric-select">Select Metric</label>
+                <select name="metric" id="metric-select" onchange="resetCounty()">
+                    <option value="life_expectancy" {% if metric == 'life_expectancy' %}selected{% endif %}>
+                        Life Expectancy
+                    </option>
+                    <option value="immunization_coverage"
+                            {% if metric == 'immunization_coverage' %}selected{% endif %}>
+                        Immunization Coverage
+                    </option>
+                    <option value="mortality_rate" {% if metric == 'mortality_rate' %}selected{% endif %}>
+                        Mortality Rate
+                    </option>
+                </select>
+            </div>
+
+            <!-- Filter Options and Chart Options -->
+            <div class="form-row">
+                <div class="form-column">
+                    <h2>Table Options</h2>
+                    <h3>Filters</h3>
+                    <label for="state">State:</label>
+                    <select name="state" id="state">
+                        <option value="">All</option>
+                        {% for state in states %}
+                            <option value="{{ state }}"
+                                    {% if filters.state == state %}selected{% endif %}>{{ state }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="county">County:</label>
+                    <select name="county" id="county">
+                        <option value="">All</option>
+                        {% for county in counties %}
+                            <option value="{{ county }}"
+                                    {% if filters.county == county %}selected{% endif %}>{{ county }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="min_value">Min Value:</label>
+                    <input type="number" name="min_value" id="min_value" placeholder="Min Value"
+                           value="{{ filters.min_value }}">
+                    <label for="max_value">Max Value:</label>
+                    <input type="number" name="max_value" id="max_value" placeholder="Max Value"
+                           value="{{ filters.max_value }}">
+
+                    <h3>Sort By</h3>
+                    <label for="sort-select">Sort:</label>
+                    <select name="sort" id="sort-select">
+                        <option value="-id" {% if sort_by == '-id' %}selected{% endif %}>Most Recent</option>
+                        <option value="state" {% if sort_by == 'state' %}selected{% endif %}>State</option>
+                        <option value="value" {% if sort_by == 'value' %}selected{% endif %}>Value</option>
+                    </select>
+                </div>
+
+                <div class="form-column">
+                    <h2>Chart Options</h2>
+                    <h3>Chart Type</h3>
+                    <select name="chart_type" id="chart-type">
+                        <option value="line">Line</option>
+                        <option value="bar">Bar</option>
+                        <option value="pie">Pie</option>
+                    </select>
+
+                    <h3>Chart Axes</h3>
+                    <label for="x-axis">X-Axis:</label>
+                    <select name="x_axis" id="x-axis">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+
+                    <label for="y-axis">Y-Axis:</label>
+                    <select name="y_axis" id="y-axis">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-group">
+                <button type="submit">Apply</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Data Table -->
+    <div class="card data-table">
+        <h2 style="text-align: center;">Data Preview</h2>
+        <table>
+            <thead>
+            <tr>
+                {% if metric == "life_expectancy" %}
+                    <th>State</th>
+                    <th>County</th>
+                    <th>Census Tract</th>
+                    <th>Life Expectancy</th>
+                    <th>Standard Error</th>
+                {% elif metric == "immunization_coverage" %}
+                    <th>Vaccine</th>
+                    <th>Dose</th>
+                    <th>Geography</th>
+                    <th>Birth Year</th>
+                    <th>Estimate</th>
+                {% elif metric == "mortality_rate" %}
+                    <th>Year</th>
+                    <th>Cause</th>
+                    <th>State</th>
+                    <th>Deaths</th>
+                    <th>Age-Adjusted Rate</th>
+                {% endif %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in preview_data %}
+                <tr>
+                    {% if metric == "life_expectancy" %}
+                        <td>{{ row.state }}</td>
+                        <td>{{ row.county }}</td>
+                        <td>{{ row.census_tract }}</td>
+                        <td>{{ row.life_expectancy }}</td>
+                        <td>{{ row.standard_error }}</td>
+                    {% elif metric == "immunization_coverage" %}
+                        <td>{{ row.vaccine }}</td>
+                        <td>{{ row.dose }}</td>
+                        <td>{{ row.geography }}</td>
+                        <td>{{ row.birth_year }}</td>
+                        <td>{{ row.estimate }}</td>
+                    {% elif metric == "mortality_rate" %}
+                        <td>{{ row.year }}</td>
+                        <td>{{ row.cause }}</td>
+                        <td>{{ row.state }}</td>
+                        <td>{{ row.deaths }}</td>
+                        <td>{{ row.age_adjusted_rate }}</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <button {% if not preview_data.has_previous %}disabled{% endif %}>
+                {% if preview_data.has_previous %}
+                    <a href="?page={{ preview_data.previous_page_number }}">Previous</a>
+                {% else %}
+                    Previous
+                {% endif %}
+            </button>
+            <button {% if not preview_data.has_next %}disabled{% endif %}>
+                {% if preview_data.has_next %}
+                    <a href="?page={{ preview_data.next_page_number }}">Next</a>
+                {% else %}
+                    Next
+                {% endif %}
+            </button>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/script.js' %}"></script>
+<script>
+    function resetCounty() {
+        document.getElementById('county').value = '';
+    }
+</script>
+</body>
+</html>
